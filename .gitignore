@@ -17,3 +17,9 @@ docs/
 .idea/
 .DS_Store
 yarn.lock
+
+hh-fcc/ethers-simple-storage-fcc/
+
+hh-fcc/hardhat-nft/artifacts/
+
+hh-fcc/hardhat-nft/node_modules/
