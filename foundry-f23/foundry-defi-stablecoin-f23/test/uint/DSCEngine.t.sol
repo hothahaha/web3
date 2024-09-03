@@ -10,7 +10,7 @@ import {ERC20Mock} from
     "lib/chainlink-brownie-contracts/contracts/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/mocks/ERC20Mock.sol";
 import {MockV3Aggregator} from "test/mocks/MockV3Aggregator.sol";
 
-contract DSCEngineTest is Test {
+contract DSCEngine is Test {
     DeployDSC deployer;
     DecentralizedStableCoin dsc;
     DSCEngine dsce;
