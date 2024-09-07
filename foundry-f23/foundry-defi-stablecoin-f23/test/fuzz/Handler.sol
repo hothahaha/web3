@@ -36,7 +36,7 @@ contract Handler is Test {
     }
 
     function mintDsc(uint256 amount, uint256 addressSeed) public {
-        if(usersWithCollateralDeposited.length == 0) {
+        if (usersWithCollateralDeposited.length == 0) {
             return;
         }
         address sender = usersWithCollateralDeposited[addressSeed % usersWithCollateralDeposited.length];
@@ -92,5 +92,4 @@ contract Handler is Test {
             return wbtc;
         }
     }
-
 }
