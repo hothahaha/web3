@@ -44,7 +44,8 @@ contract RandomIpfsNft is VRFConsumerBaseV2Plus, ERC721URIStorage {
     event NftRequested(uint256 indexed requestId, address indexed requester);
     event NftMinted(uint256 indexed tokenId, Breed indexed breed, address indexed minter);
 
-    constructor(address vrfCoordinatorV2,
+    constructor(
+        address vrfCoordinatorV2,
         uint256 subscriptionId,
         bytes32 gasLane,
         uint32 callbackGasLimit,
@@ -64,7 +65,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2Plus, ERC721URIStorage {
     // the owner of the contract can withdraw the ETH
 
     function requestNft() public payable returns (uint256 requestId) {
-        if(msg.value < i_mintFee) {
+        if (msg.value < i_mintFee) {
             revert RandomIpfsNft__NeedMoreETHSent();
         }
         requestId = i_vrfCoordinator.requestRandomWords(
@@ -83,7 +84,10 @@ contract RandomIpfsNft is VRFConsumerBaseV2Plus, ERC721URIStorage {
         emit NftRequested(requestId, msg.sender);
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
+    function fulfillRandomWords(
+        uint256 requestId,
+        uint256[] calldata randomWords
+    ) internal override {
         address dogOwner = s_requestIdToSender[requestId];
         uint256 newTokenId = s_tokenCounter;
         uint256 moddedRng = randomWords[0] % MAX_CHANCE_VALUE;
@@ -102,7 +106,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2Plus, ERC721URIStorage {
     function withdraw() public onlyOwner {
         uint256 amount = address(this).balance;
         (bool success, ) = msg.sender.call{value: amount}("");
-        if(!success) {
+        if (!success) {
             revert RandomIpfsNft__TransferFailed();
         }
     }
@@ -119,7 +123,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2Plus, ERC721URIStorage {
         uint256 cumulativeSum = 0;
         uint256[3] memory chanceArray = getChanceArray();
         for (uint256 i = 0; i < chanceArray.length; i++) {
-            if(moddedRng >= cumulativeSum && moddedRng < cumulativeSum + chanceArray[i]) {
+            if (moddedRng >= cumulativeSum && moddedRng < cumulativeSum + chanceArray[i]) {
                 return Breed(i);
             }
             cumulativeSum += chanceArray[i];
@@ -142,6 +146,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2Plus, ERC721URIStorage {
     function getDogTokenUris(uint256 index) public view returns (string memory) {
         return s_dogTokenUris[index];
     }
+
     function getInitialized() public view returns (bool) {
         return s_initialized;
     }
