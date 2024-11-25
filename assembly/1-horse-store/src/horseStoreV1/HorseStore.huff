@@ -1,0 +1,48 @@
+
+/* Interface */
+#define function updateHorseNumber(uint256 newNumber) nonpayable returns()
+#define function readNumberOfHorses() view returns(uint256)
+
+#define constant NUMBER_OF_HORSES_STORAGE_SLOT = FREE_STORAGE_POINTER() // 0
+
+#define macro MAIN() = takes(0) returns(0) {
+    // How do we cut down the calldata -> func selector?
+
+    // SHR opcode : moves bits to the right
+    // 0x0102 (bytes) 
+    // 1bytes = 8bits
+    // 0x0102 (bytes) -> 0b100000010 (bits)
+    // 01 -> 1  02 -> 0b00000010
+    // 0x0102 >> 4 = 16
+
+    0x00 calldataload 0xe0 shr
+
+    // updateHorseNumber selector
+    dup1 __FUNC_SIG(updateHorseNumber) eq updateJump jumpi       // [function_selector]
+
+    // readNumberOfHorses selector
+    __FUNC_SIG(readNumberOfHorses) eq readJump jumpi                       // []
+
+    0x00 0x00 revert            // []
+
+    updateJump:
+        SET_NUMBER_OF_HORSES()
+    readJump:
+        GET_NUMBER_OF_HORSES()
+}
+
+#define macro SET_NUMBER_OF_HORSES() = takes(0) returns(0) {
+    0x04                                    // [4]
+    calldataload                            // [newNumber] calldataload - 4
+    [NUMBER_OF_HORSES_STORAGE_SLOT]         // [storage_slot, newNumber]
+    sstore
+    stop
+}
+
+#define macro GET_NUMBER_OF_HORSES() = takes(0) returns(0) {
+    [NUMBER_OF_HORSES_STORAGE_SLOT]         // [storage_slot]
+    sload                                   // [value]
+    0x00                                    // [0, value]
+    mstore                                  // []  // Memory: [value]
+    0x20 0x00 return                                  // [value]
+}
