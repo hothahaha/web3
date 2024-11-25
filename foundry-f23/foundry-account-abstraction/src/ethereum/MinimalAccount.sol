@@ -57,8 +57,14 @@ contract MinimalAccount is IAccount, Ownable {
      * @param value 金额.
      * @param functionData 数据.
      */
-    function execute(address dest, uint256 value, bytes calldata functionData) external requireFromEntryPointOrOwner {
-        (bool success, bytes memory result) = dest.call{value: value}(functionData);
+    function execute(
+        address dest,
+        uint256 value,
+        bytes calldata functionData
+    ) external requireFromEntryPointOrOwner {
+        (bool success, bytes memory result) = dest.call{value: value}(
+            functionData
+        );
         if (!success) {
             revert MinimalAccount__CallFailed(result);
         }
@@ -71,11 +77,11 @@ contract MinimalAccount is IAccount, Ownable {
      * @param missingAccountFunds 账户缺少的资金
      * @return validationData 返回验证结果
      */
-    function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
-        external
-        requireFromEntryPoint
-        returns (uint256 validationData)
-    {
+    function validateUserOp(
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash,
+        uint256 missingAccountFunds
+    ) external requireFromEntryPoint returns (uint256 validationData) {
         validationData = _validateSignature(userOp, userOpHash);
         _payPrefund(missingAccountFunds);
     }
@@ -89,12 +95,13 @@ contract MinimalAccount is IAccount, Ownable {
      * @param userOpHash 用户操作的Hash
      * @return validationData 返回验证结果
      */
-    function _validateSignature(PackedUserOperation memory userOp, bytes32 userOpHash)
-        internal
-        view
-        returns (uint256 validationData)
-    {
-        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(userOpHash);
+    function _validateSignature(
+        PackedUserOperation memory userOp,
+        bytes32 userOpHash
+    ) internal view returns (uint256 validationData) {
+        bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(
+            userOpHash
+        );
         address signer = ECDSA.recover(ethSignedMessageHash, userOp.signature);
         if (signer != owner()) {
             return SIG_VALIDATION_FAILED;
@@ -108,7 +115,10 @@ contract MinimalAccount is IAccount, Ownable {
      */
     function _payPrefund(uint256 missingAccountFunds) internal {
         if (missingAccountFunds != 0) {
-            (bool success,) = payable(msg.sender).call{value: missingAccountFunds, gas: type(uint256).max}("");
+            (bool success, ) = payable(msg.sender).call{
+                value: missingAccountFunds,
+                gas: type(uint256).max
+            }("");
             (success);
         }
     }
